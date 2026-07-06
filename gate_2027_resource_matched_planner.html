@@ -1,0 +1,546 @@
+
+<style>
+
+:root {
+  /* Dark Theme Color Palette */
+  --bg-main: #0d1117;
+  --surface-0: #161b22;
+  --surface-1: #21262d;
+  --surface-2: #30363d;
+  
+  --text-primary: #e6edf3;
+  --text-secondary: #848d97;
+  --text-muted: #6e7681;
+  
+  --border: #30363d;
+  --border-accent: #58a6ff;
+  
+  --bg-accent: rgba(88, 166, 255, 0.15);
+  --text-accent: #58a6ff;
+  --fill-accent: #2f81f7;
+  --on-accent: #ffffff;
+  
+  --bg-warning: rgba(210, 153, 34, 0.15);
+  --text-warning: #d29922;
+  --bg-danger: rgba(248, 81, 73, 0.15);
+  --text-danger: #f85149;
+  --border-danger: rgba(248, 81, 73, 0.4);
+  --text-success: #3fb950;
+  
+  --radius: 12px;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Main Wrapper - mobile responsive */
+.wrap {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+}
+
+/* Header & Topbar */
+.topbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.topbar h1 { font-size: 1.25rem; font-weight: 600; color: var(--text-primary); line-height: 1.3; }
+.topbar p { font-size: 0.85rem; color: var(--text-secondary); margin-top: 4px; }
+
+.streak {
+  background: var(--bg-warning);
+  color: var(--text-warning);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+/* Stats Grid */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+  gap: 10px;
+  margin-bottom: 1rem;
+}
+.stat {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+.stat:hover { transform: translateY(-2px); }
+.stat-lbl { font-size: 0.65rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; font-weight: 600; }
+.stat-val { font-size: 1.5rem; font-weight: 600; }
+
+/* Progress Bar */
+.pbar { background: var(--surface-2); border-radius: 20px; height: 8px; overflow: hidden; margin-bottom: 1.5rem; }
+.pfill { height: 100%; border-radius: 20px; background: var(--fill-accent); transition: width 0.4s ease; }
+
+/* Legends */
+.legend-res, .phlegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  background: var(--surface-0);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.lr, .pl { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--text-secondary); }
+.lr b { font-weight: 600; color: var(--text-primary); }
+.pld { width: 10px; height: 10px; border-radius: 50%; box-shadow: 0 0 4px rgba(0,0,0,0.5); }
+
+/* Filters */
+.filter { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 1.5rem; }
+.flt, .jump {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--surface-1);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+.flt:hover { background: var(--surface-2); color: var(--text-primary); }
+.flt.on { border-color: var(--border-accent); background: var(--bg-accent); color: var(--text-accent); }
+.jump { border-color: var(--border-accent); color: var(--text-accent); background: transparent; }
+.jump:hover { background: var(--bg-accent); }
+
+/* Weekly Container */
+.wk {
+  margin-bottom: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--surface-0);
+}
+.wkh {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--surface-1);
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s;
+}
+.wkh:hover { background: var(--surface-2); }
+.wkh-l { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.wknum { font-size: 0.8rem; font-weight: 600; color: var(--text-primary); }
+.wkph { font-size: 0.65rem; padding: 2px 8px; border-radius: 20px; font-weight: 600; text-transform: uppercase; }
+.wkdt { font-size: 0.75rem; color: var(--text-secondary); }
+.wkpr { font-size: 0.75rem; font-weight: 600; color: var(--text-accent); }
+
+/* Daily Tasks */
+.day { padding: 14px 16px; border-bottom: 1px solid var(--border); transition: background 0.2s; }
+.day:last-child { border-bottom: none; }
+.day.today { background: var(--bg-accent); border-left: 3px solid var(--fill-accent); }
+.day.done { opacity: 0.6; }
+.day.lost { background: var(--bg-danger); opacity: 0.8; }
+.day.rest { background: var(--surface-1); text-align: center; font-style: italic; color: var(--text-muted); }
+
+/* Mobile-Friendly Grid for Tasks */
+.day-top {
+  display: grid;
+  grid-template-columns: 60px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 12px;
+}
+@media (max-width: 500px) {
+  .day-top { grid-template-columns: 1fr; gap: 8px; }
+  .dcol:first-child { display: flex; align-items: baseline; gap: 8px; border-bottom: 1px solid var(--border); padding-bottom: 6px; margin-bottom: 4px; }
+  .dright { flex-direction: row !important; justify-content: space-between; align-items: center; width: 100%; margin-top: 8px; }
+  .chk { width: 20px !important; height: 20px !important; }
+}
+
+.dcol { display: flex; flex-direction: column; }
+.dname { font-size: 0.85rem; font-weight: 600; color: var(--text-primary); }
+.ddate { font-size: 0.7rem; color: var(--text-secondary); margin-top: 2px; }
+.dnum { font-size: 0.65rem; color: var(--text-muted); margin-top: 4px; font-weight: 500; }
+
+.dsubj { font-size: 0.95rem; font-weight: 500; color: var(--text-primary); line-height: 1.4; }
+.dbook { font-size: 0.75rem; color: var(--text-accent); margin-top: 6px; display: flex; align-items: center; gap: 6px; font-weight: 500; }
+.dtask { font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px; }
+
+.dright { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+
+/* Dark Theme Badge Pills */
+.pill { font-size: 0.65rem; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap; text-transform: uppercase; letter-spacing: 0.03em; }
+.p-concept { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+.p-pyq     { background: rgba(74, 222, 128, 0.15); color: #4ade80; }
+.p-mock    { background: rgba(250, 204, 21, 0.15);  color: #facc15; }
+.p-rev     { background: rgba(167, 139, 250, 0.15); color: #a78bfa; }
+.p-ga      { background: rgba(244, 114, 182, 0.15); color: #f472b6; }
+.p-rest    { background: var(--surface-2);          color: var(--text-muted); }
+
+/* Interactive Elements */
+.chk { width: 18px; height: 18px; cursor: pointer; accent-color: var(--fill-accent); border-radius: 4px; }
+.lostbtn {
+  font-size: 0.65rem;
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border-danger);
+  color: var(--text-danger);
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+.lostbtn:hover { background: var(--bg-danger); }
+.lostbtn.undo { border-color: var(--border); color: var(--text-secondary); }
+.lostbtn.undo:hover { background: var(--surface-2); color: var(--text-primary); }
+
+/* Video Links */
+.vidrow { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+.vid {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  text-decoration: none;
+  color: var(--text-primary);
+  background: var(--surface-1);
+  transition: all 0.2s ease;
+}
+.vid:hover { border-color: var(--border-accent); background: var(--surface-2); transform: translateX(4px); }
+.vid i.yt { color: #ff0000; font-size: 1.1rem; }
+.vid .ch { font-size: 0.7rem; color: var(--text-muted); margin-left: auto; white-space: nowrap; }
+
+/* Load More Button */
+.loadmore {
+  width: 100%;
+  padding: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-accent);
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+  margin-bottom: 2rem;
+}
+.loadmore:hover { background: var(--bg-accent); border-color: var(--border-accent); }
+</style>
+
+<div class="wrap">
+<h2 class="sr-only">GATE 2027 day-wise planner matched to PW and Math PYQ books with YouTube video links per topic</h2>
+
+<div class="topbar">
+  <div>
+    <h1>GATE 2027 — daily plan with your books + videos</h1>
+    <p>Jul 6, 2026 → exam · full syllabus by end Jan · then test mode</p>
+  </div>
+  <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+    <div class="streak" id="streak">0-day streak</div>
+    <button class="jump" onclick="jump()">Today</button>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat"><div class="stat-lbl">Study days</div><div class="stat-val" id="s-total">0</div></div>
+  <div class="stat"><div class="stat-lbl">Done</div><div class="stat-val" id="s-done" style="color:var(--text-success)">0</div></div>
+  <div class="stat"><div class="stat-lbl">Left</div><div class="stat-val" id="s-rem">0</div></div>
+  <div class="stat"><div class="stat-lbl">Lost</div><div class="stat-val" id="s-lost" style="color:var(--text-danger)">0</div></div>
+  <div class="stat"><div class="stat-lbl">Done %</div><div class="stat-val" id="s-pct">0%</div></div>
+</div>
+<div class="pbar"><div class="pfill" id="pfill" style="width:0%"></div></div>
+
+<div class="legend-res">
+  <div class="lr"><i class="ti ti-book" style="color:#185FA5" aria-hidden="true"></i><b>PW book</b> = PW GATE CSE PYQ (core)</div>
+  <div class="lr"><i class="ti ti-book" style="color:#3B6D11" aria-hidden="true"></i><b>Math book</b> = Math & Aptitude PYQ</div>
+  <div class="lr"><i class="ti ti-brand-youtube" style="color:#c4302b" aria-hidden="true"></i><b>Video</b> = watch then practise</div>
+</div>
+
+<div class="phlegend">
+  <div class="pl"><div class="pld" style="background:#185FA5"></div>Concepts + videos (Jul–Sep)</div>
+  <div class="pl"><div class="pld" style="background:#3B6D11"></div>PYQ solving (Oct–Jan)</div>
+  <div class="pl"><div class="pld" style="background:#854F0B"></div>Test mode (post-Jan)</div>
+  <div class="pl"><div class="pld" style="background:#3C3489"></div>Revision</div>
+</div>
+
+<div class="filter">
+  <span style="font-size:11px;color:var(--text-muted)">Show:</span>
+  <button class="flt on" onclick="setF('all',this)">All</button>
+  <button class="flt" onclick="setF('concept',this)">Learn</button>
+  <button class="flt" onclick="setF('pyq',this)">PYQ</button>
+  <button class="flt" onclick="setF('mock',this)">Mock</button>
+  <button class="flt" onclick="setF('upcoming',this)">Upcoming</button>
+</div>
+
+<div id="sched"></div>
+</div>
+
+<script>
+var TODAY=new Date(2026,6,6);
+var checked=JSON.parse(localStorage.getItem('g27r_done')||'{}');
+var lost=JSON.parse(localStorage.getItem('g27r_lost')||'{}');
+var openW={};var filt='all';var vis=6;
+
+var YT={
+  osPL:'https://www.youtube.com/playlist?list=PLxCzCOWd7aiGz9donHRrE9I3Mwn6XdP8p',
+  dbmsPL:'https://www.youtube.com/playlist?list=PLxCzCOWd7aiFAN6I8CuViBuCdJgiOkT2Y',
+  cnGS:'https://www.youtube.com/playlist?list=PLxCzCOWd7aiGFBD2-2joCpWOLUrDLvVV_',
+  cnKG:'https://www.youtube.com/playlist?list=PLmXKhU9FNesSjFbXSZGF8JF_4LVwwofCd',
+  tocGS:'https://www.youtube.com/playlist?list=PLxCzCOWd7aiFM9Lj5G9G_76adtyb4ef7i',
+  cdGS:'https://www.youtube.com/playlist?list=PLxCzCOWd7aiEKtKSIHYusizkESC42diyc',
+  coaGS:'https://www.youtube.com/playlist?list=PLxCzCOWd7aiHMonh3G6QNsq56uJ_9Yb1z',
+  dsGS:'https://www.youtube.com/playlist?list=PLxCzCOWd7aiHDp2VDDb3Uz_gWyc79r3xy',
+  cKG:'https://www.youtube.com/playlist?list=PLmXKhU9FNesSfX1PVt4VGm-wbIKfemUWK',
+  dmKG:'https://www.youtube.com/playlist?list=PLmXKhU9FNesQrSgLxm6zx3XxH_M_8n3LA',
+  algoKG:'https://www.youtube.com/playlist?list=PLmXKhU9FNesQJ3rpOAFE6RTm-2u2diwKn',
+  purohitLA:'https://www.youtube.com/playlist?list=PLU6SqdYcYsfLrTna7UuqZ8Lm_D3wusHfW',
+  purohitProb:'https://www.youtube.com/playlist?list=PLU6SqdYcYsfIYjEbdyOEIkq_6yGZemwpX',
+  purohitCalc:'https://www.youtube.com/playlist?list=PLU6SqdYcYsfID5S53d1x0_gK9_kQ6f_2W'
+};
+
+function V(label,url,ch){return{label:label,url:url,ch:ch};}
+
+var PLAN=[
+{ph:1,subj:'Discrete Math — propositional & first-order logic',book:'Math book Ch.10.1 · PW Ch.10.1',task:'Watch → solve all PYQs of chapter',type:'concept',days:3,
+ vids:[V('Knowledge Gate — Prop. logic one-shot',YT.dmKG,'Knowledge Gate'),V('Gate Smashers — Discrete Math',YT.dmKG,'Knowledge Gate')]},
+{ph:1,subj:'Discrete Math — sets, relations, functions',book:'PW Ch.10.2',task:'Concept video + solve chapter PYQs',type:'concept',days:3,
+ vids:[V('Knowledge Gate — Set theory & relations',YT.dmKG,'Knowledge Gate')]},
+{ph:1,subj:'Discrete Math — graph theory',book:'PW Ch.10.3',task:'Video + all graph PYQs',type:'concept',days:3,
+ vids:[V('Knowledge Gate — Graph theory GATE',YT.dmKG,'Knowledge Gate')]},
+{ph:1,subj:'Discrete Math — combinatorics & recurrence',book:'PW Ch.10.4',task:'Counting + recurrence PYQs',type:'concept',days:2,
+ vids:[V('Knowledge Gate — Combinatorics',YT.dmKG,'Knowledge Gate')]},
+{ph:1,subj:'GA — Data Interpretation + Numerical',book:'Math book GA section',task:'20 GA PYQs timed',type:'ga',days:2,
+ vids:[V('Gajendra Purohit — Aptitude tricks',YT.purohitLA,'Dr. Gajendra Purohit')]},
+{ph:1,subj:'Linear Algebra — matrices, determinant, rank',book:'Math book Ch.1.1',task:'Video + chapter PYQs',type:'concept',days:3,
+ vids:[V('Gajendra Purohit — Linear Algebra',YT.purohitLA,'Dr. Gajendra Purohit')]},
+{ph:1,subj:'Linear Algebra — eigenvalues, eigenvectors, LU',book:'Math book Ch.1.1',task:'Eigenvalue PYQs cold',type:'concept',days:2,
+ vids:[V('Gajendra Purohit — Eigenvalues',YT.purohitLA,'Dr. Gajendra Purohit')]},
+{ph:1,subj:'Probability — random variables, distributions',book:'Math book Ch.1.3',task:'Distribution PYQs',type:'concept',days:3,
+ vids:[V('Gajendra Purohit — Probability',YT.purohitProb,'Dr. Gajendra Purohit')]},
+{ph:1,subj:'Probability — conditional, Bayes, expectation',book:'Math book Ch.1.3',task:'Bayes + expectation PYQs',type:'concept',days:2,
+ vids:[V('Gajendra Purohit — Bayes theorem',YT.purohitProb,'Dr. Gajendra Purohit')]},
+{ph:1,subj:'Calculus — limits, continuity, differentiability',book:'Math book Ch.1.2',task:'Concept + light PYQs',type:'concept',days:2,
+ vids:[V('Gajendra Purohit — Calculus',YT.purohitCalc,'Dr. Gajendra Purohit')]},
+{ph:1,subj:'Calculus — maxima-minima, integration, MVT',book:'Math book Ch.1.2',task:'Solve remaining PYQs',type:'concept',days:1,
+ vids:[V('Gajendra Purohit — Maxima minima',YT.purohitCalc,'Dr. Gajendra Purohit')]},
+{ph:1,subj:'REVIEW — Math + Discrete',book:'Both books',task:'Redo wrong PYQs + formula sheet',type:'rev',days:1,vids:[]},
+{ph:1,subj:'C Prog — data types, operators, control flow',book:'PW Ch.5.1–5.2',task:'Trace output programs',type:'concept',days:2,
+ vids:[V('Neso Academy — C Programming',YT.dsGS,'via Gate Smashers playlist')]},
+{ph:1,subj:'C Prog — functions & storage classes',book:'PW Ch.5.3',task:'Recursion trace PYQs',type:'concept',days:2,
+ vids:[V('Gate Smashers — C programming',YT.dsGS,'Gate Smashers')]},
+{ph:1,subj:'C Prog — pointers & strings',book:'PW Ch.5.4',task:'Pointer output PYQs (spec-level)',type:'concept',days:3,
+ vids:[V('Gate Smashers — Pointers in C',YT.dsGS,'Gate Smashers')]},
+{ph:1,subj:'GA — Verbal ability + reasoning',book:'Math book GA section',task:'20 GA PYQs timed',type:'ga',days:2,vids:[]},
+{ph:1,subj:'DS — arrays & linked lists',book:'PW Ch.5.5',task:'Implementation + PYQs',type:'concept',days:2,
+ vids:[V('Gate Smashers — DSA playlist',YT.dsGS,'Gate Smashers')]},
+{ph:1,subj:'DS — stacks & queues',book:'PW Ch.5.6',task:'Stack/queue output PYQs',type:'concept',days:2,
+ vids:[V('Gate Smashers — Stacks & queues',YT.dsGS,'Gate Smashers')]},
+{ph:1,subj:'DS — trees (BST, traversals, height)',book:'PW Ch.5.7',task:'BST PYQs cold on paper',type:'concept',days:3,
+ vids:[V('Gate Smashers — Trees / BST',YT.dsGS,'Gate Smashers')]},
+{ph:1,subj:'DS — hashing',book:'PW Ch.5.8',task:'Hashing PYQs',type:'concept',days:2,
+ vids:[V('Gate Smashers — Hashing',YT.dsGS,'Gate Smashers')]},
+{ph:1,subj:'REVIEW — C + DS',book:'PW Ch.5',task:'Redo 4 hardest programs blind',type:'rev',days:1,vids:[]},
+{ph:1,subj:'Algorithms — asymptotic analysis',book:'PW Ch.6.1',task:'Big-O PYQs',type:'concept',days:2,
+ vids:[V('Knowledge Gate — Algorithms',YT.algoKG,'Knowledge Gate')]},
+{ph:1,subj:'Algorithms — divide & conquer, recurrences',book:'PW Ch.6.2',task:'Master theorem PYQs cold',type:'concept',days:3,
+ vids:[V('Knowledge Gate — Recurrences',YT.algoKG,'Knowledge Gate')]},
+{ph:1,subj:'Algorithms — greedy (MST, Huffman)',book:'PW Ch.6.3',task:'MST PYQs + cut property',type:'concept',days:2,
+ vids:[V('Knowledge Gate — Greedy / MST',YT.algoKG,'Knowledge Gate')]},
+{ph:1,subj:'Algorithms — graph algorithms (BFS/DFS/shortest path)',book:'PW Ch.6.4',task:'Edge classification PYQs',type:'concept',days:3,
+ vids:[V('Knowledge Gate — Graph algorithms',YT.algoKG,'Knowledge Gate')]},
+{ph:1,subj:'Algorithms — dynamic programming',book:'PW Ch.6.5',task:'DP recurrence PYQs',type:'concept',days:2,
+ vids:[V('Knowledge Gate — Dynamic programming',YT.algoKG,'Knowledge Gate')]},
+{ph:1,subj:'GA — Numerical + logical reasoning',book:'Math book GA section',task:'20 GA PYQs timed',type:'ga',days:2,vids:[]},
+{ph:1,subj:'REVIEW — Algorithms',book:'PW Ch.6',task:'Redo 4 hardest PYQs blind',type:'rev',days:1,vids:[]},
+{ph:1,subj:'OS — process management & CPU scheduling',book:'PW Ch.2.1',task:'Scheduling numericals (FCFS/SJF/SRTF)',type:'concept',days:3,
+ vids:[V('Gate Smashers — OS full playlist',YT.osPL,'Gate Smashers')]},
+{ph:1,subj:'OS — process synchronization',book:'PW Ch.2.2',task:'Semaphore PYQs',type:'concept',days:2,
+ vids:[V('Gate Smashers — Synchronization',YT.osPL,'Gate Smashers')]},
+{ph:1,subj:'OS — deadlocks',book:'PW Ch.2.3',task:'Banker + RAG PYQs',type:'concept',days:2,
+ vids:[V('Gate Smashers — Deadlock',YT.osPL,'Gate Smashers')]},
+{ph:1,subj:'OS — memory management (paging, virtual memory)',book:'PW Ch.2.4',task:'Address translation PYQs',type:'concept',days:3,
+ vids:[V('Gate Smashers — Memory management',YT.osPL,'Gate Smashers')]},
+{ph:1,subj:'OS — file system & disk management',book:'PW Ch.2.5',task:'Disk PYQs',type:'concept',days:2,
+ vids:[V('Gate Smashers — File & disk',YT.osPL,'Gate Smashers')]},
+{ph:1,subj:'GA — full timed GA section',book:'Math book GA section',task:'10-Q GA mock',type:'ga',days:2,vids:[]},
+{ph:1,subj:'REVIEW — OS',book:'PW Ch.2',task:'Scheduling PYQs + formula sheet',type:'rev',days:1,vids:[]},
+{ph:1,subj:'COA — machine instr & addressing modes',book:'PW Ch.4.1',task:'Addressing PYQs',type:'concept',days:2,
+ vids:[V('Gate Smashers — COA playlist',YT.coaGS,'Gate Smashers')]},
+{ph:1,subj:'COA — ALU & control unit',book:'PW Ch.4.2',task:'Control unit PYQs',type:'concept',days:1,
+ vids:[V('Gate Smashers — ALU & control',YT.coaGS,'Gate Smashers')]},
+{ph:1,subj:'COA — instruction pipelining',book:'PW Ch.4.3',task:'Pipeline stall PYQs',type:'concept',days:3,
+ vids:[V('Gate Smashers — Pipelining',YT.coaGS,'Gate Smashers')]},
+{ph:1,subj:'COA — memory hierarchy (cache, IEEE754)',book:'PW Ch.4.4',task:'Cache + float PYQs cold',type:'concept',days:3,
+ vids:[V('Gate Smashers — Cache memory',YT.coaGS,'Gate Smashers')]},
+{ph:1,subj:'COA — I/O interface (DMA, interrupts)',book:'PW Ch.4.5',task:'I/O PYQs',type:'concept',days:2,
+ vids:[V('Gate Smashers — I/O & DMA',YT.coaGS,'Gate Smashers')]},
+{ph:1,subj:'GA — full timed GA mock',book:'Math book GA section',task:'10-Q GA mock',type:'ga',days:1,vids:[]},
+{ph:1,subj:'Digital Logic — number system & codes',book:'PW Ch.9.1',task:'Number system PYQs',type:'concept',days:2,
+ vids:[V('Knowledge Gate — Digital logic',YT.cKG,'Knowledge Gate')]},
+{ph:1,subj:'Digital Logic — Boolean algebra & K-maps',book:'PW Ch.9.2',task:'K-map minimization PYQs',type:'concept',days:3,
+ vids:[V('Knowledge Gate — K-map',YT.cKG,'Knowledge Gate')]},
+{ph:1,subj:'Digital Logic — combinational circuits',book:'PW Ch.9.3',task:'MUX/decoder PYQs',type:'concept',days:2,
+ vids:[V('Knowledge Gate — Combinational',YT.cKG,'Knowledge Gate')]},
+{ph:1,subj:'Digital Logic — sequential circuits',book:'PW Ch.9.4',task:'Flip-flop PYQs',type:'concept',days:2,
+ vids:[V('Knowledge Gate — Sequential circuits',YT.cKG,'Knowledge Gate')]},
+{ph:1,subj:'PHASE 1 REVIEW — rapid all-subject revision',book:'Both books',task:'Formula pass + weak-Q redo',type:'rev',days:3,vids:[]},
+
+{ph:2,subj:'DBMS — ER model & relational model',book:'PW Ch.1.1',task:'Solve all chapter PYQs',type:'pyq',days:2,
+ vids:[V('Gate Smashers — DBMS playlist',YT.dbmsPL,'Gate Smashers')]},
+{ph:2,subj:'DBMS — functional dependency & normalization',book:'PW Ch.1.2',task:'BCNF decomposition PYQs',type:'pyq',days:3,
+ vids:[V('Gate Smashers — Normalization',YT.dbmsPL,'Gate Smashers')]},
+{ph:2,subj:'DBMS — transactions & concurrency',book:'PW Ch.1.3',task:'Serializability + 2PL PYQs',type:'pyq',days:2,
+ vids:[V('Gate Smashers — Transactions/2PL',YT.dbmsPL,'Gate Smashers')]},
+{ph:2,subj:'DBMS — relational algebra, SQL, TRC',book:'PW Ch.1.4',task:'RA + SQL PYQs',type:'pyq',days:2,
+ vids:[V('Gate Smashers — SQL & RA',YT.dbmsPL,'Gate Smashers')]},
+{ph:2,subj:'DBMS — file organization & indexing',book:'PW Ch.1.5',task:'B+ tree PYQs',type:'pyq',days:2,
+ vids:[V('Gate Smashers — Indexing/B+ tree',YT.dbmsPL,'Gate Smashers')]},
+{ph:2,subj:'GA — full timed GA section',book:'Math book GA',task:'10-Q mock',type:'ga',days:1,vids:[]},
+{ph:2,subj:'TOC — finite automata & transducer',book:'PW Ch.8.1',task:'DFA/NFA min-state PYQs',type:'pyq',days:3,
+ vids:[V('Gate Smashers — TOC playlist',YT.tocGS,'Gate Smashers')]},
+{ph:2,subj:'TOC — regular expression',book:'PW Ch.8.2',task:'RE equivalence PYQs',type:'pyq',days:2,
+ vids:[V('Gate Smashers — Regular expressions',YT.tocGS,'Gate Smashers')]},
+{ph:2,subj:'TOC — regular language & grammar',book:'PW Ch.8.3',task:'Closure property PYQs',type:'pyq',days:2,
+ vids:[V('Gate Smashers — Regular languages',YT.tocGS,'Gate Smashers')]},
+{ph:2,subj:'TOC — CFL & CFG',book:'PW Ch.8.4',task:'CFG derivation PYQs',type:'pyq',days:2,
+ vids:[V('Gate Smashers — CFG / PDA',YT.tocGS,'Gate Smashers')]},
+{ph:2,subj:'TOC — Turing machine & undecidability',book:'PW Ch.8.5–8.6',task:'Decidability PYQs',type:'pyq',days:2,
+ vids:[V('Gate Smashers — Turing machine',YT.tocGS,'Gate Smashers')]},
+{ph:2,subj:'Compiler — intro & lexical analysis',book:'PW Ch.7.1–7.2',task:'Lexer PYQs',type:'pyq',days:2,
+ vids:[V('Gate Smashers — Compiler playlist',YT.cdGS,'Gate Smashers')]},
+{ph:2,subj:'Compiler — syntax analysis (parsing)',book:'PW Ch.7.3',task:'FIRST/FOLLOW/LL(1)/SLR PYQs',type:'pyq',days:3,
+ vids:[V('Gate Smashers — Parsing (LL/LR)',YT.cdGS,'Gate Smashers')]},
+{ph:2,subj:'Compiler — syntax-directed translation',book:'PW Ch.7.4',task:'SDD PYQs',type:'pyq',days:2,
+ vids:[V('Gate Smashers — SDT',YT.cdGS,'Gate Smashers')]},
+{ph:2,subj:'Compiler — intermediate code & optimization',book:'PW Ch.7.5–7.7',task:'Basic block PYQs',type:'pyq',days:2,
+ vids:[V('Gate Smashers — Code optimization',YT.cdGS,'Gate Smashers')]},
+{ph:2,subj:'GA — full timed GA section',book:'Math book GA',task:'10-Q mock',type:'ga',days:1,vids:[]},
+{ph:2,subj:'CN — basic concepts & IPv4 addressing',book:'PW Ch.3.1',task:'CIDR/subnetting PYQs',type:'pyq',days:3,
+ vids:[V('Gate Smashers — CN playlist',YT.cnGS,'Gate Smashers'),V('Knowledge Gate — CN',YT.cnKG,'Knowledge Gate')]},
+{ph:2,subj:'CN — data link layer + MAC',book:'PW Ch.3.2–3.3',task:'CRC + sliding window PYQs',type:'pyq',days:2,
+ vids:[V('Gate Smashers — Data link layer',YT.cnGS,'Gate Smashers')]},
+{ph:2,subj:'CN — network layer (IP, fragmentation, routing)',book:'PW Ch.3.4',task:'Fragmentation PYQs',type:'pyq',days:3,
+ vids:[V('Gate Smashers — Network layer',YT.cnGS,'Gate Smashers')]},
+{ph:2,subj:'CN — transport layer (TCP, congestion)',book:'PW Ch.3.5',task:'TCP cwnd PYQs',type:'pyq',days:2,
+ vids:[V('Gate Smashers — Transport / TCP',YT.cnGS,'Gate Smashers')]},
+{ph:2,subj:'CN — application layer',book:'PW Ch.3.6',task:'DNS/HTTP PYQs',type:'pyq',days:1,
+ vids:[V('Gate Smashers — Application layer',YT.cnGS,'Gate Smashers')]},
+{ph:2,subj:'PYQ marathon — Tier-1 subjects mixed (2015–2020)',book:'PW: DS/Algo/OS/COA',task:'20 PYQs in 60 min timed',type:'pyq',days:4,vids:[]},
+{ph:2,subj:'PYQ marathon — Tier-1 subjects mixed (2021–2024)',book:'PW: DS/Algo/OS/COA',task:'20 PYQs in 60 min timed',type:'pyq',days:4,vids:[]},
+{ph:2,subj:'PYQ marathon — Tier-2 subjects mixed',book:'PW: DBMS/TOC/CD/CN/DL',task:'15 PYQs in 45 min timed',type:'pyq',days:3,vids:[]},
+{ph:2,subj:'PYQ marathon — Math + GA (all years)',book:'Math book — full',task:'Mixed math + GA timed',type:'pyq',days:3,vids:[]},
+{ph:2,subj:'Weak-area drill — bottom 3 topics from PYQ errors',book:'Both books',task:'Re-solve weak-topic PYQs',type:'pyq',days:3,vids:[]},
+{ph:2,subj:'FULL SYLLABUS COMPLETE — final PYQ error digest',book:'Both books',task:'Review every wrong answer once',type:'rev',days:2,vids:[]},
+
+{ph:3,subj:'Full mock #1 (3 hr timed)',book:'Test mode begins',task:'Exam conditions, no breaks',type:'mock',days:1,vids:[]},
+{ph:3,subj:'Mock #1 deep analysis',book:'—',task:'Categorise: silly / concept / time',type:'rev',days:2,vids:[]},
+{ph:3,subj:'Weak-topic drill from mock #1',book:'PW/Math PYQ',task:'10 PYQs each weak topic',type:'pyq',days:2,vids:[]},
+{ph:3,subj:'Full mock #2 (3 hr timed)',book:'—',task:'Time each section',type:'mock',days:1,vids:[]},
+{ph:3,subj:'Mock #2 analysis + formula sheet update',book:'—',task:'Update personal sheet only',type:'rev',days:2,vids:[]},
+{ph:3,subj:'Weak-topic drill from mock #2',book:'PW/Math PYQ',task:'Targeted PYQ drill',type:'pyq',days:2,vids:[]},
+{ph:3,subj:'GA speed drill — 3 sections back-to-back',book:'Math book GA',task:'30 GA Qs in 45 min',type:'ga',days:1,vids:[]},
+{ph:3,subj:'Full mock #3 + analysis',book:'—',task:'Focus NAT (no negative marking)',type:'mock',days:2,vids:[]},
+{ph:3,subj:'Full mock #4 + analysis',book:'—',task:'Aim 55 Qs in 170 min',type:'mock',days:2,vids:[]},
+{ph:3,subj:'Full mock #5 + analysis',book:'—',task:'Simulate exact GATE routine',type:'mock',days:2,vids:[]},
+{ph:3,subj:'Full mock #6 + analysis',book:'—',task:'Treat as real exam',type:'mock',days:2,vids:[]},
+{ph:3,subj:'Formula sheet revision — Math+DS+Algo',book:'Personal sheet',task:'Read only, no new problems',type:'rev',days:2,vids:[]},
+{ph:3,subj:'Formula sheet revision — OS+COA+DL',book:'Personal sheet',task:'Read only',type:'rev',days:2,vids:[]},
+{ph:3,subj:'Formula sheet revision — DBMS+CN+TOC+CD',book:'Personal sheet',task:'Read only',type:'rev',days:2,vids:[]},
+{ph:3,subj:'19 guaranteed-mark topics — rapid cold drill',book:'PW PYQ',task:'1 fresh problem/topic, 2 min each',type:'rev',days:3,vids:[]},
+{ph:3,subj:'Final simulation + rest',book:'—',task:'One mock, then protect sleep',type:'rev',days:3,vids:[]}
+];
+
+var DAYS=[];
+function build(){
+ var d=new Date(2026,6,6);var dn=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+ PLAN.forEach(function(p){
+  for(var i=0;i<p.days;i++){
+   while(d.getDay()===0){DAYS.push({date:new Date(d),dn:dn[0],subj:'Rest — Sunday',book:'',task:'No study',type:'rest',vids:[],ph:0});d.setDate(d.getDate()+1);}
+   var pl=p.ph===1?'Concepts':p.ph===2?'PYQ solving':'Test mode';
+   DAYS.push({date:new Date(d),dn:dn[d.getDay()],subj:p.subj,book:p.book,task:p.task,type:p.type,vids:p.vids||[],ph:p.ph,phl:pl});
+   d.setDate(d.getDate()+1);
+  }
+ });
+ DAYS.forEach(function(x,i){x.idx=i;});
+ var sn=0;DAYS.forEach(function(x){if(x.type!=='rest'){sn++;x.sn=sn;}});
+}
+function fmt(d){return d.getDate()+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()];}
+function fmtF(d){return d.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});}
+function same(a,b){return a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();}
+function weeks(){var m={};DAYS.forEach(function(day){var wd=new Date(day.date);var dw=wd.getDay();var df=wd.getDate()-(dw===0?6:dw-1);var mo=new Date(wd);mo.setDate(df);var k=mo.toISOString().slice(0,10);if(!m[k])m[k]={mo:mo,days:[],ph:0,phl:''};m[k].days.push(day);if(day.ph>0){m[k].ph=day.ph;m[k].phl=day.phl;}});return Object.keys(m).sort().map(function(k){return m[k];});}
+function pl(t){return{concept:'p-concept',pyq:'p-pyq',mock:'p-mock',rev:'p-rev',ga:'p-ga',rest:'p-rest'}[t]||'p-concept';}
+function tl(t){return{concept:'Learn',pyq:'PYQ',mock:'Mock',rev:'Revise',ga:'GA',rest:'Rest'}[t]||t;}
+function phc(p){return{1:'#185FA5',2:'#3B6D11',3:'#854F0B',0:'#888780'}[p];}
+function phb(p){return{1:'#E6F1FB',2:'#EAF3DE',3:'#FAEEDA',0:'#F1EFE8'}[p];}
+function save(){try{localStorage.setItem('g27r_done',JSON.stringify(checked));localStorage.setItem('g27r_lost',JSON.stringify(lost));}catch(e){}}
+function tD(i){if(checked[i])delete checked[i];else checked[i]=true;save();render();}
+function tL(i){if(lost[i])delete lost[i];else lost[i]=true;save();render();}
+function setF(f,el){filt=f;document.querySelectorAll('.flt').forEach(function(b){b.classList.remove('on');});el.classList.add('on');render();}
+function jump(){var e=document.getElementById('tanchor');if(e)e.scrollIntoView({behavior:'smooth',block:'center'});}
+function rv(day){if(filt==='all')return true;if(filt==='upcoming')return !checked[day.idx]&&day.date>=TODAY&&day.type!=='rest';return day.type===filt;}
+function streak(){var s=0;for(var i=DAYS.length-1;i>=0;i--){var d=DAYS[i];if(d.type==='rest'||d.date>=TODAY)continue;if(checked[d.idx])s++;else break;}return s;}
+function stats(){var t=DAYS.filter(function(d){return d.type!=='rest';}).length;var dn=Object.keys(checked).length;var lo=Object.keys(lost).length;var pc=Math.round(dn/t*100);document.getElementById('s-total').textContent=t;document.getElementById('s-done').textContent=dn;document.getElementById('s-rem').textContent=Math.max(0,t-dn-lo);document.getElementById('s-lost').textContent=lo;document.getElementById('s-pct').textContent=pc+'%';document.getElementById('pfill').style.width=pc+'%';document.getElementById('streak').textContent=streak()+'-day streak';}
+function render(){
+ stats();var ws=weeks();var html='';var shown=0;
+ var totalVisWeeks=ws.filter(function(w){return w.days.some(rv);}).length;
+ ws.forEach(function(w,wi){
+  if(!w.days.some(rv))return;
+  if(shown>=vis&&filt==='all')return;
+  shown++;
+  var op=openW[wi]!==false;
+  var dc=w.days.filter(function(d){return checked[d.idx];}).length;
+  var sd=w.days.filter(function(d){return d.type!=='rest';}).length;
+  var ht=w.days.some(function(d){return same(d.date,TODAY);});
+  html+='<div class="wk"><div class="wkh" onclick="tW('+wi+')"><div class="wkh-l"><span class="wknum">Wk '+(wi+1)+'</span><span class="wkph" style="background:'+phb(w.ph)+';color:'+phc(w.ph)+'">'+w.phl+'</span>'+(ht?'<span style="font-size:10px;background:var(--bg-accent);color:var(--text-accent);padding:1px 6px;border-radius:20px;font-weight:500">now</span>':'')+'</div><div style="display:flex;align-items:center;gap:10px"><span class="wkdt">'+fmt(w.mo)+' – '+fmt(w.days[w.days.length-1].date)+'</span><span class="wkpr">'+dc+'/'+sd+'</span><i class="ti ti-chevron-down" style="font-size:14px;color:var(--text-muted);transform:'+(op?'rotate(180deg)':'rotate(0)')+'" aria-hidden="true"></i></div></div>';
+  if(op){html+='<div>';w.days.forEach(function(day){
+   if(!rv(day))return;
+   var dd=!!checked[day.idx],ll=!!lost[day.idx],td=same(day.date,TODAY);
+   var cls='day'+(td?' today':dd?' done':ll?' lost':day.type==='rest'?' rest':'');
+   var anc=td?' id="tanchor"':'';
+   html+='<div class="'+cls+'"'+anc+'>';
+   html+='<div class="day-top"><div class="dcol"><div class="dname">'+day.dn+'</div><div class="ddate">'+fmt(day.date)+'</div>'+(day.sn?'<div class="dnum">D'+day.sn+'</div>':'')+'</div>';
+   html+='<div class="dcol"><div class="dsubj">'+(ll?'<s>':'')+day.subj+(ll?'</s>':'')+'</div>';
+   if(day.book)html+='<div class="dbook"><i class="ti ti-book" aria-hidden="true"></i>'+day.book+'</div>';
+   html+='<div class="dtask">'+(ll?'Day lost — will shift':day.task)+'</div>';
+   html+='</div>';
+   html+='<div class="dright"><span class="pill '+pl(day.type)+'">'+tl(day.type)+'</span>';
+   if(day.type!=='rest')html+=ll?'<button class="lostbtn undo" onclick="tL('+day.idx+')">undo</button>':'<button class="lostbtn" onclick="tL('+day.idx+')">lost</button>';
+   if(day.type!=='rest')html+='<input type="checkbox" class="chk" '+(dd?'checked':'')+' onchange="tD('+day.idx+')" aria-label="done">';
+   html+='</div></div>';
+   if(day.vids&&day.vids.length&&!ll){html+='<div class="vidrow">';day.vids.forEach(function(v){html+='<a class="vid" href="'+v.url+'" target="_blank" rel="noopener"><i class="ti ti-brand-youtube yt" aria-hidden="true"></i><span>'+v.label+'</span><span class="ch">'+v.ch+'</span></a>';});html+='</div>';}
+   html+='</div>';
+  });html+='</div>';}
+  html+='</div>';
+ });
+ if(filt==='all'&&shown<totalVisWeeks)html+='<button class="loadmore" onclick="more()">Load more weeks — '+(totalVisWeeks-shown)+' left</button>';
+ document.getElementById('sched').innerHTML=html;
+}
+function tW(i){openW[i]=openW[i]===false?true:false;render();}
+function more(){vis+=6;render();}
+build();
+var ws=weeks();ws.forEach(function(w,wi){if(w.days.some(function(d){return same(d.date,TODAY);}))for(var i=0;i<=wi;i++)openW[i]=true;});
+render();
+</script>
