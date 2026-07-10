@@ -299,9 +299,18 @@ body {
 
 .day:last-child { border-bottom: none; }
 .day.today { background: var(--bg-accent); border-left: 3px solid var(--fill-accent); }
-.day.done { opacity: 0.6; }
+.day.done { opacity: 0.7; background: rgba(63, 185, 80, 0.08); }
 .day.lost { background: var(--bg-danger); opacity: 0.8; }
 .day.rest { background: var(--surface-1); text-align: center; font-style: italic; color: var(--text-muted); }
+
+/* Checkmark Symbol */
+.checkmark {
+  display: inline-block;
+  color: var(--text-success);
+  font-weight: 700;
+  margin-right: 4px;
+  font-size: 1.1em;
+}
 
 /* Mobile-Friendly Grid for Tasks */
 .day-top {
@@ -359,6 +368,11 @@ body {
   font-weight: 500;
   color: var(--text-primary);
   line-height: 1.4;
+}
+
+.dsubj.completed {
+  text-decoration: line-through;
+  color: var(--text-muted);
 }
 
 .dbook { 
@@ -756,7 +770,7 @@ function build(){
 function fmt(d){return d.getDate()+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()];}
 function fmtF(d){return d.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});}
 function same(a,b){return a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();}
-function weeks(){var m={};DAYS.forEach(function(day){var wd=new Date(day.date);var dw=wd.getDay();var df=wd.getDate()-(dw===0?6:dw-1);var mo=new Date(wd);mo.setDate(df);var k=mo.toISOString().slice(0,10);if(!m[k])m[k]={ph:day.ph,days:[]};m[k].days.push(day);});var ws=[];Object.keys(m).sort().forEach(function(k){ws.push(m[k]);});return ws;}
+function weeks(){var m={};DAYS.forEach(function(day){var wd=new Date(day.date);var dw=wd.getDay();var df=wd.getDate()-(dw===0?6:dw-1);var mo=new Date(wd);mo.setDate(df);var k=mo.toISOString().slice(0,10);if(!m[k]){m[k]={days:[],ph:day.ph};}m[k].days.push(day);});var ws=[];Object.keys(m).forEach(function(k){ws.push(m[k]);});return ws;}
 function pl(t){return{concept:'p-concept',pyq:'p-pyq',mock:'p-mock',rev:'p-rev',ga:'p-ga',rest:'p-rest'}[t]||'p-concept';}
 function tl(t){return{concept:'Learn',pyq:'PYQ',mock:'Mock',rev:'Revise',ga:'GA',rest:'Rest'}[t]||t;}
 function phc(p){return{1:'#185FA5',2:'#3B6D11',3:'#854F0B',0:'#888780'}[p];}
@@ -768,7 +782,7 @@ function setF(f,el){filt=f;document.querySelectorAll('.flt').forEach(function(b)
 function jump(){var e=document.getElementById('tanchor');if(e)e.scrollIntoView({behavior:'smooth',block:'center'});}
 function rv(day){if(filt==='all')return true;if(filt==='upcoming')return !checked[day.idx]&&day.date>=TODAY&&day.type!=='rest';return day.type===filt;}
 function streak(){var s=0;for(var i=DAYS.length-1;i>=0;i--){var d=DAYS[i];if(d.type==='rest'||d.date>=TODAY)continue;if(checked[d.idx])s++;else break;}return s;}
-function stats(){var t=DAYS.filter(function(d){return d.type!=='rest';}).length;var dn=Object.keys(checked).length;var lo=Object.keys(lost).length;var pc=Math.round(dn/t*100);document.getElementById('s-total').textContent=t;document.getElementById('s-done').textContent=dn;document.getElementById('s-rem').textContent=t-dn-lo;document.getElementById('s-lost').textContent=lo;document.getElementById('s-pct').textContent=pc+'%';document.getElementById('pfill').style.width=pc+'%';document.getElementById('streak').textContent=streak()+'-day streak';}
+function stats(){var t=DAYS.filter(function(d){return d.type!=='rest';}).length;var dn=Object.keys(checked).length;var lo=Object.keys(lost).length;var pc=Math.round(dn/t*100);document.getElementById('s-total').textContent=t;document.getElementById('s-done').textContent=dn;document.getElementById('s-rem').textContent=Math.max(0,t-dn-lo);document.getElementById('s-lost').textContent=lo;document.getElementById('s-pct').textContent=pc+'%';document.getElementById('pfill').style.width=pc+'%';document.getElementById('streak').textContent=streak()+'-day streak';}
 function render(){
  stats();var ws=weeks();var html='';var shown=0;
  var totalVisWeeks=ws.filter(function(w){return w.days.some(rv);}).length;
@@ -780,7 +794,7 @@ function render(){
   var dc=w.days.filter(function(d){return checked[d.idx];}).length;
   var sd=w.days.filter(function(d){return d.type!=='rest';}).length;
   var ht=w.days.some(function(d){return same(d.date,TODAY);});
-  html+='<div class="wk"><div class="wkh" onclick="tW('+wi+')"><div class="wkh-l"><span class="wknum">Wk '+(wi+1)+'</span><span class="wkph" style="background:'+phb(w.ph)+';color:'+phc(w.ph)+'">'+(w.ph===1?'Concepts':w.ph===2?'PYQ':'Test')+'</span><span class="wkdt">'+w.days[0].dn+' — '+fmt(w.days[w.days.length-1].date)+'</span><span class="wkpr">'+dc+'/'+sd+' done</span></div><span>'+(op?'▼':'▶')+'</span></div>';
+  html+='<div class="wk"><div class="wkh" onclick="tW('+wi+')"><div class="wkh-l"><span class="wknum">Wk '+(wi+1)+'</span><span class="wkph" style="background:'+phb(w.ph)+';color:'+phc(w.ph)+'">'+w.ph+'</span><span class="wkdt">'+dc+'/'+sd+' done</span></div><span class="wkpr">'+(op?'▼':'▶')+'</span></div>';
   if(op){html+='<div>';w.days.forEach(function(day){
    if(!rv(day))return;
    var dd=!!checked[day.idx],ll=!!lost[day.idx],td=same(day.date,TODAY);
@@ -788,7 +802,7 @@ function render(){
    var anc=td?' id="tanchor"':'';
    html+='<div class="'+cls+'"'+anc+'>';
    html+='<div class="day-top"><div class="dcol"><div class="dname">'+day.dn+'</div><div class="ddate">'+fmt(day.date)+'</div>'+(day.sn?'<div class="dnum">D'+day.sn+'</div>':'')+'</div>';
-   html+='<div class="dcol"><div class="dsubj">'+(ll?'<s>':'')+day.subj+(ll?'</s>':'')+'</div>';
+   html+='<div class="dcol"><div class="dsubj '+(dd?'completed':'')+'">'+( dd?'<span class="checkmark">✓</span>':'')+(ll?'<s>':'')+day.subj+(ll?'</s>':'')+'</div>';
    if(day.book)html+='<div class="dbook"><i class="ti ti-book" aria-hidden="true"></i>'+day.book+'</div>';
    html+='<div class="dtask">'+(ll?'Day lost — will shift':day.task)+'</div>';
    html+='</div>';
@@ -796,7 +810,7 @@ function render(){
    if(day.type!=='rest')html+=ll?'<button class="lostbtn undo" onclick="tL('+day.idx+')">undo</button>':'<button class="lostbtn" onclick="tL('+day.idx+')">lost</button>';
    if(day.type!=='rest')html+='<input type="checkbox" class="chk" '+(dd?'checked':'')+' onchange="tD('+day.idx+')" aria-label="Mark '+day.subj+' as done">';
    html+='</div></div>';
-   if(day.vids&&day.vids.length&&!ll){html+='<div class="vidrow">';day.vids.forEach(function(v){html+='<a class="vid" href="'+v.url+'" target="_blank" rel="noopener"><i class="ti ti-brand-youtube" aria-hidden="true"></i><span>'+v.label+' <span class="ch">'+v.ch+'</span></span></a>';});html+='</div>';}
+   if(day.vids&&day.vids.length&&!ll){html+='<div class="vidrow">';day.vids.forEach(function(v){html+='<a class="vid" href="'+v.url+'" target="_blank" rel="noopener"><i class="ti ti-brand-youtube yt" aria-hidden="true"></i><span>'+v.label+'</span><span class="ch">'+v.ch+'</span></a>';});html+='</div>';}
    html+='</div>';
   });html+='</div>';}
   html+='</div>';
