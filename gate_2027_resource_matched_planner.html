@@ -35,6 +35,7 @@
   --text-danger: #f85149;
   --border-danger: rgba(248, 81, 73, 0.4);
   --text-success: #3fb950;
+  --bg-success: rgba(63, 185, 80, 0.15);
   
   --radius: 12px;
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
@@ -299,7 +300,7 @@ body {
 
 .day:last-child { border-bottom: none; }
 .day.today { background: var(--bg-accent); border-left: 3px solid var(--fill-accent); }
-.day.done { opacity: 0.7; background: rgba(63, 185, 80, 0.08); }
+.day.done { opacity: 0.7; background: var(--bg-success); }
 .day.lost { background: var(--bg-danger); opacity: 0.8; }
 .day.rest { background: var(--surface-1); text-align: center; font-style: italic; color: var(--text-muted); }
 
@@ -315,13 +316,13 @@ body {
 /* Mobile-Friendly Grid for Tasks */
 .day-top {
   display: grid;
-  grid-template-columns: 50px minmax(0, 1fr) auto;
+  grid-template-columns: 1fr auto;
   align-items: start;
-  gap: 10px;
+  gap: 12px;
 }
 
 @media (max-width: 640px) {
-  .day-top { grid-template-columns: 1fr; gap: 8px; }
+  .day-top { grid-template-columns: 1fr; gap: 10px; }
   .dcol:first-child { 
     display: flex;
     align-items: baseline;
@@ -333,13 +334,12 @@ body {
   }
   .dright { 
     flex-direction: row !important;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
     width: 100%;
     margin-top: 8px;
+    gap: 8px;
   }
-  .chk { width: 24px !important; height: 24px !important; min-height: 44px; min-width: 44px; padding: 10px; }
-  .lostbtn { min-height: 44px; padding: 8px 12px; }
 }
 
 .dcol { display: flex; flex-direction: column; }
@@ -397,6 +397,7 @@ body {
   flex-direction: column;
   align-items: flex-end;
   gap: 8px;
+  min-width: max-content;
 }
 
 /* Dark Theme Badge Pills */
@@ -418,39 +419,82 @@ body {
 .p-ga      { background: rgba(244, 114, 182, 0.15); color: #f472b6; }
 .p-rest    { background: var(--surface-2); color: var(--text-muted); }
 
-/* Interactive Elements */
-.chk { 
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-  accent-color: var(--fill-accent);
-  border-radius: 4px;
-  -webkit-appearance: none;
-  appearance: none;
+/* Action Buttons Container */
+.action-btns {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
-.lostbtn {
-  font-size: clamp(0.65rem, 1.5vw, 0.75rem);
-  padding: 6px 10px;
+/* Mark Done Button */
+.btn-done {
+  padding: 8px 14px;
   border-radius: 6px;
-  border: 1px solid var(--border-danger);
-  color: var(--text-danger);
-  background: transparent;
+  border: 2px solid var(--text-success);
+  background: var(--bg-success);
+  color: var(--text-success);
   cursor: pointer;
   font-family: inherit;
   font-weight: 600;
+  font-size: clamp(0.7rem, 2vw, 0.8rem);
   transition: all 0.2s ease;
   -webkit-tap-highlight-color: transparent;
   min-height: 40px;
-  min-width: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
+  white-space: nowrap;
 }
 
-.lostbtn:active { background: var(--bg-danger); }
-.lostbtn.undo { border-color: var(--border); color: var(--text-secondary); }
-.lostbtn.undo:active { background: var(--surface-2); color: var(--text-primary); }
+.btn-done:hover {
+  background: rgba(63, 185, 80, 0.25);
+  border-color: var(--text-success);
+}
+
+.btn-done:active {
+  transform: scale(0.95);
+  background: var(--bg-success);
+}
+
+.btn-done.checked {
+  background: var(--text-success);
+  color: var(--bg-main);
+}
+
+/* Mark Lost Button */
+.btn-lost {
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: 2px solid var(--text-danger);
+  background: transparent;
+  color: var(--text-danger);
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: clamp(0.7rem, 2vw, 0.8rem);
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.btn-lost:hover {
+  background: var(--bg-danger);
+}
+
+.btn-lost:active {
+  transform: scale(0.95);
+  background: var(--bg-danger);
+}
+
+.btn-lost.checked {
+  background: var(--text-danger);
+  color: var(--bg-main);
+}
 
 /* Video Links */
 .vidrow { 
@@ -801,15 +845,15 @@ function render(){
    var cls='day'+(td?' today':dd?' done':ll?' lost':day.type==='rest'?' rest':'');
    var anc=td?' id="tanchor"':'';
    html+='<div class="'+cls+'"'+anc+'>';
-   html+='<div class="day-top"><div class="dcol"><div class="dname">'+day.dn+'</div><div class="ddate">'+fmt(day.date)+'</div>'+(day.sn?'<div class="dnum">D'+day.sn+'</div>':'')+'</div>';
-   html+='<div class="dcol"><div class="dsubj '+(dd?'completed':'')+'">'+( dd?'<span class="checkmark">✓</span>':'')+(ll?'<s>':'')+day.subj+(ll?'</s>':'')+'</div>';
+   html+='<div class="day-top">';
+   html+='<div class="dcol"><div class="dname">'+day.dn+'</div><div class="ddate">'+fmt(day.date)+'</div>'+(day.sn?'<div class="dnum">D'+day.sn+'</div>':'')+'<div class="dsubj '+(dd?'completed':'')+'">'+( dd?'<span class="checkmark">✓</span>':'')+(ll?'<s>':'')+day.subj+(ll?'</s>':'')+'</div>';
    if(day.book)html+='<div class="dbook"><i class="ti ti-book" aria-hidden="true"></i>'+day.book+'</div>';
    html+='<div class="dtask">'+(ll?'Day lost — will shift':day.task)+'</div>';
    html+='</div>';
-   html+='<div class="dright"><span class="pill '+pl(day.type)+'">'+tl(day.type)+'</span>';
-   if(day.type!=='rest')html+=ll?'<button class="lostbtn undo" onclick="tL('+day.idx+')">undo</button>':'<button class="lostbtn" onclick="tL('+day.idx+')">lost</button>';
-   if(day.type!=='rest')html+='<input type="checkbox" class="chk" '+(dd?'checked':'')+' onchange="tD('+day.idx+')" aria-label="Mark '+day.subj+' as done">';
-   html+='</div></div>';
+   html+='<div class="dright">';
+   if(day.type!=='rest'){html+='<div class="action-btns">';html+=ll?'<button class="btn-lost checked" onclick="tL('+day.idx+')">✕ Undo</button>':'<button class="btn-lost" onclick="tL('+day.idx+')">✕ Lost</button>';html+=dd?'<button class="btn-done checked" onclick="tD('+day.idx+')">✓ Done</button>':'<button class="btn-done" onclick="tD('+day.idx+')">✓ Mark Done</button>';html+='</div>';}else{html+='<span class="pill '+pl(day.type)+'">'+tl(day.type)+'</span>';}
+   html+='</div>';
+   html+='</div>';
    if(day.vids&&day.vids.length&&!ll){html+='<div class="vidrow">';day.vids.forEach(function(v){html+='<a class="vid" href="'+v.url+'" target="_blank" rel="noopener"><i class="ti ti-brand-youtube yt" aria-hidden="true"></i><span>'+v.label+'</span><span class="ch">'+v.ch+'</span></a>';});html+='</div>';}
    html+='</div>';
   });html+='</div>';}
